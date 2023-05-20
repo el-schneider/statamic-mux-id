@@ -1,0 +1,28 @@
+{
+    "name": "el-schneider/statamic-mux-id",
+    "description": "A Statamic addon that integrates Mux Video API",
+    "type": "statamic-addon",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonas List",
+            "email": "mail@jonaslist.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ElSchneider\\StatamicMuxId\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Statamic Mux Id",
+            "description": "Statamic Mux Id addon"
+        },
+        "laravel": {
+            "providers": [
+                "ElSchneider\\StatamicMuxId\\ServiceProvider"
+            ]
+        }
+    }
+}
