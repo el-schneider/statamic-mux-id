@@ -45,8 +45,8 @@ class CreateMuxAsset implements ShouldQueue
         $assetsApi = new AssetsApi(new Client(), $this->config);
         $playbackIdApi = new PlaybackIDApi(new Client(), $this->config);
 
-        // determine the url based on environment
-        $url = $this->asset->permalink();
+        // get absolute asset url
+        $url = $this->asset->absoluteUrl();
 
         $input = new InputSettings(["url" => $url]);
         $createAssetRequest = new CreateAssetRequest([
