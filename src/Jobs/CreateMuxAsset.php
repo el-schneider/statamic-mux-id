@@ -30,13 +30,13 @@ class CreateMuxAsset implements ShouldQueue
         $this->asset = $asset;
 
         $this->config = Configuration::getDefaultConfiguration()
-            ->setUsername(config('mux-id.mux_token_id'))
-            ->setPassword(config('mux-id.mux_token_secret'));
+            ->setUsername(config('statamic.mux-id.mux_token_id'))
+            ->setPassword(config('statamic.mux-id.mux_token_secret'));
     }
 
     public function handle()
     {
-        $allowed_filestypes = config('mux-id.allowed_filetypes');
+        $allowed_filestypes = config('statamic.mux-id.allowed_filetypes');
 
         if (!in_array($this->asset->extension(), $allowed_filestypes)) {
             return;
@@ -46,9 +46,7 @@ class CreateMuxAsset implements ShouldQueue
         $playbackIdApi = new PlaybackIDApi(new Client(), $this->config);
 
         // determine the url based on environment
-        $url = 'https://7539-2001-16b8-9041-ad00-4c6d-5c7d-a17a-3a65.ngrok-free.app' . $this->asset->url();
-
-        ray("url", $this->asset->url());
+        $url = $this->asset->permalink();
 
         $input = new InputSettings(["url" => $url]);
         $createAssetRequest = new CreateAssetRequest([
@@ -63,8 +61,6 @@ class CreateMuxAsset implements ShouldQueue
             'status' => $response->getData()->getStatus(),
             'id' => $response->getData()->getId(),
         ];
-
-        ray($mux_data);
 
         $this->asset->set('mux_data', $mux_data);
 
