@@ -24,5 +24,8 @@
                 "ElSchneider\\StatamicMuxId\\ServiceProvider"
             ]
         }
+    },
+    "require": {
+        "muxinc/mux-php": "^3.10"
     }
 }
