@@ -3,7 +3,9 @@
 namespace ElSchneider\StatamicMuxId;
 
 use ElSchneider\StatamicMuxId\Controllers\Http\MuxIdController;
+use ElSchneider\StatamicMuxId\GraphQL\MuxIdField;
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\GraphQL;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -23,5 +25,16 @@ class ServiceProvider extends AddonServiceProvider
         $this->registerActionRoutes(function () {
             Route::post("/listen", [MuxIdController::class, 'update']);
         });
+
+        $this->bootGraphQL();
+    }
+
+    private function bootGraphQL(): self
+    {
+        GraphQL::addField('AssetInterface', 'mux_playback_id', function () {
+            return (new MuxIdField())->toArray();
+        });
+
+        return $this;
     }
 }
