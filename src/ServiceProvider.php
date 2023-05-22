@@ -15,6 +15,9 @@ class ServiceProvider extends AddonServiceProvider
         'Statamic\Events\AssetUploaded' => [
             'ElSchneider\StatamicMuxId\Listeners\AssetUploadedListener',
         ],
+        'Statamic\Events\AssetSaved' => [
+            'ElSchneider\StatamicMuxId\Listeners\AssetSavedListener',
+        ],
     ];
 
     public function bootAddon()
