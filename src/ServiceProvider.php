@@ -2,6 +2,7 @@
 
 namespace ElSchneider\StatamicMuxId;
 
+use App\Http\Middleware\VerifyCsrfToken;
 use ElSchneider\StatamicMuxId\Controllers\Http\MuxIdController;
 use ElSchneider\StatamicMuxId\GraphQL\MuxIdField;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,7 @@ class ServiceProvider extends AddonServiceProvider
         ]);
 
         $this->registerActionRoutes(function () {
-            Route::post("/listen", [MuxIdController::class, 'update']);
+            Route::post("/listen", [MuxIdController::class, 'update'])->withoutMiddleware([VerifyCsrfToken::class]);
         });
 
         $this->bootGraphQL();
