@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.1 - 2026-06-18
+
+### What's fixed
+
+- Prevent permanent Mux API errors from breaking Statamic asset uploads when queues run synchronously.
+- Store permanent Mux API failures on the asset metadata with `status: errored` and the Mux error details.
+- Keep transient Mux/server errors retryable by rethrowing non-4xx API failures.
+- Collapse the Mux metadata field behind a revealer button in asset blueprints so it does not dominate the asset edit screen.
+
 ## v0.1.0 - 2026-06-18
 
 ### What's new
