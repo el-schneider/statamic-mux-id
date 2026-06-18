@@ -7,27 +7,9 @@ use Statamic\Events\AssetUploaded;
 
 class AssetUploadedListener
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function handle(AssetUploaded $event): void
     {
-        //
-    }
-
-    /**
-     * Handle the event.
-     *
-     * @return void
-     */
-    public function handle(AssetUploaded $event)
-    {
-        // dispatch job to create mux asset
-        $asset = $event->asset;
-
-        CreateMuxAsset::dispatch($asset)
+        CreateMuxAsset::dispatch($event->asset->id())
             ->onQueue(config('statamic.mux-id.queue'));
     }
 }

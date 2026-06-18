@@ -4,49 +4,49 @@ namespace ElSchneider\StatamicMuxId\Jobs;
 
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MuxPhp\Api\AssetsApi;
-use MuxPhp\Api\PlaybackIDApi;
 use MuxPhp\Configuration;
 use MuxPhp\Models\CreateAssetRequest;
 use MuxPhp\Models\InputSettings;
 use MuxPhp\Models\PlaybackPolicy;
+use Statamic\Facades\Asset;
 
-class CreateMuxAsset implements ShouldQueue
+class CreateMuxAsset implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 3;
+    public int $tries = 3;
 
-    private $config;
+    public int $uniqueFor = 3600;
 
-    protected $asset;
+    public function __construct(private string $assetId) {}
 
-    public function __construct($asset)
+    public function handle(): void
     {
-        $this->asset = $asset;
+        $asset = Asset::find($this->assetId);
 
-        $this->config = Configuration::getDefaultConfiguration()
-            ->setUsername(config('statamic.mux-id.mux_token_id'))
-            ->setPassword(config('statamic.mux-id.mux_token_secret'));
-    }
-
-    public function handle()
-    {
-        $allowed_filestypes = config('statamic.mux-id.allowed_filetypes');
-
-        if (! in_array($this->asset->extension(), $allowed_filestypes)) {
+        if (! $asset) {
             return;
         }
 
-        $assetsApi = new AssetsApi(new Client, $this->config);
-        $playbackIdApi = new PlaybackIDApi(new Client, $this->config);
+        $allowedFiletypes = config('statamic.mux-id.allowed_filetypes');
 
-        // get absolute asset url
-        $url = $this->asset->absoluteUrl();
+        if (! in_array(strtolower($asset->extension()), $allowedFiletypes, true)) {
+            return;
+        }
+
+        $config = Configuration::getDefaultConfiguration()
+            ->setUsername(config('statamic.mux-id.mux_token_id'))
+            ->setPassword(config('statamic.mux-id.mux_token_secret'));
+
+        $assetsApi = new AssetsApi(new Client, $config);
+
+        $url = $asset->absoluteUrl();
 
         $input = new InputSettings(['url' => $url]);
         $createAssetRequest = new CreateAssetRequest([
@@ -62,8 +62,13 @@ class CreateMuxAsset implements ShouldQueue
             'id' => $response->getData()->getId(),
         ];
 
-        $this->asset->set('mux_data', $mux_data);
+        $asset->set('mux_data', $mux_data);
 
-        $this->asset->saveQuietly();
+        $asset->saveQuietly();
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->assetId;
     }
 }

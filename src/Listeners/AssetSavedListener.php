@@ -7,31 +7,16 @@ use Statamic\Events\AssetSaved;
 
 class AssetSavedListener
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Handle the event.
-     *
-     * @return void
-     */
-    public function handle(AssetSaved $event)
+    public function handle(AssetSaved $event): void
     {
         $asset = $event->asset;
+        $muxData = $asset->get('mux_data');
 
-        // check is asset has a playback id
-        if (isset($asset->get('mux_data')['playback_id'])) {
+        if (isset($muxData['id']) || isset($muxData['playback_id'])) {
             return;
         }
 
-        CreateMuxAsset::dispatch($asset)
+        CreateMuxAsset::dispatch($asset->id())
             ->onQueue(config('statamic.mux-id.queue'));
     }
 }
