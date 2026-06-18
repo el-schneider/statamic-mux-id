@@ -34,6 +34,9 @@ jobs:
 
       - run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Composer audit
+        run: composer audit --no-interaction
+
       - name: Pint
         run: ./vendor/bin/pint --test
 

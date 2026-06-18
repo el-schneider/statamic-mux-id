@@ -11,6 +11,10 @@ updates:
       semver-patch-days: 7
       include:
         - '*'
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: composer
     directory: /
