@@ -20,7 +20,6 @@ class AssetUploadedListener
     /**
      * Handle the event.
      *
-     * @param  \Statamic\Events\AssetUploaded  $event
      * @return void
      */
     public function handle(AssetUploaded $event)
@@ -29,6 +28,6 @@ class AssetUploadedListener
         $asset = $event->asset;
 
         CreateMuxAsset::dispatch($asset)
-            ->onQueue(config('mux-id.queue'));
+            ->onQueue(config('statamic.mux-id.queue'));
     }
 }

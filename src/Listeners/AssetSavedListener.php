@@ -20,7 +20,6 @@ class AssetSavedListener
     /**
      * Handle the event.
      *
-     * @param  \Statamic\Events\AssetSaved  $event
      * @return void
      */
     public function handle(AssetSaved $event)
@@ -33,6 +32,6 @@ class AssetSavedListener
         }
 
         CreateMuxAsset::dispatch($asset)
-            ->onQueue(config('mux-id.queue'));
+            ->onQueue(config('statamic.mux-id.queue'));
     }
 }

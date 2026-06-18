@@ -11,6 +11,8 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected $config = false;
+
     protected $listen = [
         'Statamic\Events\AssetUploaded' => [
             'ElSchneider\StatamicMuxId\Listeners\AssetUploadedListener',
@@ -18,16 +20,26 @@ class ServiceProvider extends AddonServiceProvider
         'Statamic\Events\AssetSaved' => [
             'ElSchneider\StatamicMuxId\Listeners\AssetSavedListener',
         ],
+        'Statamic\Events\AssetContainerBlueprintFound' => [
+            'ElSchneider\StatamicMuxId\Listeners\EnsureMuxMetadataField',
+        ],
     ];
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->mergeConfigFrom(__DIR__.'/../config/mux-id.php', 'statamic.mux-id');
+    }
 
     public function bootAddon()
     {
         $this->publishes([
-            __DIR__ . '/../config/mux-id.php' => config_path('statamic/mux-id.php'),
+            __DIR__.'/../config/mux-id.php' => config_path('statamic/mux-id.php'),
         ]);
 
         $this->registerActionRoutes(function () {
-            Route::post("/listen", [MuxIdController::class, 'update'])->withoutMiddleware([VerifyCsrfToken::class]);
+            Route::post('/listen', [MuxIdController::class, 'update'])->withoutMiddleware([VerifyCsrfToken::class]);
         });
 
         $this->bootGraphQL();
@@ -36,7 +48,7 @@ class ServiceProvider extends AddonServiceProvider
     private function bootGraphQL(): self
     {
         GraphQL::addField('AssetInterface', 'mux_playback_id', function () {
-            return (new MuxIdField())->toArray();
+            return (new MuxIdField)->toArray();
         });
 
         return $this;
