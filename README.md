@@ -19,5 +19,8 @@ composer require el-schneider/statamic-mux-id
 
 ## How to Use
 
-1. Add env vars `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET`
-2. Point the webhook in your Mux dashboard to `<yourdomain>/!/statamic-mux-id/listen`
+1. Add env vars `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET`.
+2. Point the webhook in your Mux dashboard to `<yourdomain>/!/statamic-mux-id/listen`.
+3. Copy the webhook signing secret from the Mux dashboard and add it as `MUX_WEBHOOK_SECRET`.
+
+Unsigned webhooks are still accepted when `MUX_WEBHOOK_SECRET` is not configured, but signed webhooks are recommended for production.

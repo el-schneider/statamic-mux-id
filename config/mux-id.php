@@ -18,6 +18,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mux Webhook Secret
+    |--------------------------------------------------------------------------
+    |
+    | The Mux webhook signing secret is used to verify webhook requests.
+    | Leave empty to allow unsigned webhooks for existing installations.
+    |
+     */
+
+    'webhook_secret' => env('MUX_WEBHOOK_SECRET', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Allowed filetype
     |--------------------------------------------------------------------------
     |
@@ -26,9 +38,9 @@ return [
      */
 
     'allowed_filetypes' => [
-        "mp4",
-        "mov",
-        "avi",
+        'mp4',
+        'mov',
+        'avi',
     ],
 
     /*
