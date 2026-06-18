@@ -1,4 +1,6 @@
-node_modules
 vendor
-mix-manifest.json
+.phpunit.result.cache
+.php-cs-fixer.cache
 .DS_Store
+/.vscode
+.env
