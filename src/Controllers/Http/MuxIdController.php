@@ -55,14 +55,14 @@ class MuxIdController extends Controller
 {
     private const SIGNATURE_TOLERANCE = 300;
 
-    private $events_list = [
+    private const SUPPORTED_EVENTS = [
         'video.asset.created',
         'video.asset.ready',
         'video.asset.errored',
         'video.asset.updated',
     ];
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         if (! $this->hasValidSignature($request, config('statamic.mux-id.webhook_secret'))) {
             return new JsonResponse([
@@ -70,16 +70,33 @@ class MuxIdController extends Controller
             ], 401);
         }
 
-        // get the event type
-        $type = $request->type;
+        $type = $request->input('type');
 
-        // check if the event type is in the list of events we want to listen for
-        if (! in_array($type, $this->events_list)) {
-            return;
+        if (! is_string($type)) {
+            return new JsonResponse([
+                'message' => 'Missing webhook event type.',
+            ], 400);
         }
 
-        // get the mux asset id from the request
-        $muxAssetId = $request->object['id'];
+        if (! in_array($type, self::SUPPORTED_EVENTS, true)) {
+            return new JsonResponse(null, 204);
+        }
+
+        $muxAssetId = $request->input('object.id');
+
+        if (! is_string($muxAssetId)) {
+            return new JsonResponse([
+                'message' => 'Missing Mux asset id.',
+            ], 400);
+        }
+
+        $data = $request->input('data', []);
+
+        if (! is_array($data)) {
+            return new JsonResponse([
+                'message' => 'Invalid Mux asset data.',
+            ], 400);
+        }
 
         // search assets and look for an asset, that has a field mux_data['id'] matching $muxAssetId
         $asset = Asset::all()->filter(function ($asset) use ($muxAssetId) {
@@ -97,12 +114,14 @@ class MuxIdController extends Controller
             ], 404);
         }
 
-        // update mux_data of the asset with the reponse
-        $merged_data = array_merge($asset->get('mux_data'), $request->data);
-        $asset->set('mux_data', $merged_data);
+        $asset->set('mux_data', array_merge(
+            (array) $asset->get('mux_data'),
+            $data
+        ));
 
-        // save the asset
         $asset->saveQuietly();
+
+        return new JsonResponse(null, 204);
     }
 
     private function hasValidSignature(Request $request, ?string $secret): bool
