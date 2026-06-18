@@ -2,10 +2,16 @@
 
 namespace ElSchneider\StatamicMuxId;
 
-use App\Http\Middleware\VerifyCsrfToken;
 use ElSchneider\StatamicMuxId\Controllers\Http\MuxIdController;
 use ElSchneider\StatamicMuxId\GraphQL\MuxIdField;
+use ElSchneider\StatamicMuxId\Listeners\AssetSavedListener;
+use ElSchneider\StatamicMuxId\Listeners\AssetUploadedListener;
+use ElSchneider\StatamicMuxId\Listeners\EnsureMuxMetadataField;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
+use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetUploaded;
 use Statamic\Facades\GraphQL;
 use Statamic\Providers\AddonServiceProvider;
 
@@ -14,14 +20,14 @@ class ServiceProvider extends AddonServiceProvider
     protected $config = false;
 
     protected $listen = [
-        'Statamic\Events\AssetUploaded' => [
-            'ElSchneider\StatamicMuxId\Listeners\AssetUploadedListener',
+        AssetUploaded::class => [
+            AssetUploadedListener::class,
         ],
-        'Statamic\Events\AssetSaved' => [
-            'ElSchneider\StatamicMuxId\Listeners\AssetSavedListener',
+        AssetSaved::class => [
+            AssetSavedListener::class,
         ],
-        'Statamic\Events\AssetContainerBlueprintFound' => [
-            'ElSchneider\StatamicMuxId\Listeners\EnsureMuxMetadataField',
+        AssetContainerBlueprintFound::class => [
+            EnsureMuxMetadataField::class,
         ],
     ];
 
@@ -32,25 +38,24 @@ class ServiceProvider extends AddonServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/mux-id.php', 'statamic.mux-id');
     }
 
-    public function bootAddon()
+    public function bootAddon(): void
     {
         $this->publishes([
             __DIR__.'/../config/mux-id.php' => config_path('statamic/mux-id.php'),
         ]);
 
         $this->registerActionRoutes(function () {
-            Route::post('/listen', [MuxIdController::class, 'update'])->withoutMiddleware([VerifyCsrfToken::class]);
+            Route::post('/listen', [MuxIdController::class, 'update'])->withoutMiddleware([ValidateCsrfToken::class]);
         });
 
         $this->bootGraphQL();
     }
 
-    private function bootGraphQL(): self
+    private function bootGraphQL(): void
     {
         GraphQL::addField('AssetInterface', 'mux_playback_id', function () {
             return (new MuxIdField)->toArray();
         });
 
-        return $this;
     }
 }
