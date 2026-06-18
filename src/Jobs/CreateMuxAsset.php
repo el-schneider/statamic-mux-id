@@ -38,20 +38,20 @@ class CreateMuxAsset implements ShouldQueue
     {
         $allowed_filestypes = config('statamic.mux-id.allowed_filetypes');
 
-        if (!in_array($this->asset->extension(), $allowed_filestypes)) {
+        if (! in_array($this->asset->extension(), $allowed_filestypes)) {
             return;
         }
 
-        $assetsApi = new AssetsApi(new Client(), $this->config);
-        $playbackIdApi = new PlaybackIDApi(new Client(), $this->config);
+        $assetsApi = new AssetsApi(new Client, $this->config);
+        $playbackIdApi = new PlaybackIDApi(new Client, $this->config);
 
         // get absolute asset url
         $url = $this->asset->absoluteUrl();
 
-        $input = new InputSettings(["url" => $url]);
+        $input = new InputSettings(['url' => $url]);
         $createAssetRequest = new CreateAssetRequest([
-            "input" => [$input],
-            "playback_policy" => [PlaybackPolicy::_PUBLIC],
+            'input' => [$input],
+            'playback_policy' => [PlaybackPolicy::_PUBLIC],
         ]);
 
         $response = $assetsApi->createAsset($createAssetRequest);

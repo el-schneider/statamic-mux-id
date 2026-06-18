@@ -9,7 +9,6 @@ use Statamic\Facades\GraphQL;
 
 class MuxIdField extends Field
 {
-
     public function type(): Type
     {
         return GraphQL::string();
@@ -19,7 +18,7 @@ class MuxIdField extends Field
     {
         $mux_data = $asset->get('mux_data');
 
-        if (!isset($mux_data)) {
+        if (! isset($mux_data)) {
             return null;
         }
 
