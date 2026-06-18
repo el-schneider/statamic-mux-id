@@ -9,7 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use MuxPhp\Api\AssetsApi;
+use MuxPhp\ApiException;
 use MuxPhp\Configuration;
 use MuxPhp\Models\CreateAssetRequest;
 use MuxPhp\Models\InputSettings;
@@ -54,7 +56,27 @@ class CreateMuxAsset implements ShouldBeUnique, ShouldQueue
             'playback_policies' => [PlaybackPolicy::_PUBLIC],
         ]);
 
-        $response = $assetsApi->createAsset($createAssetRequest);
+        try {
+            $response = $assetsApi->createAsset($createAssetRequest);
+        } catch (ApiException $exception) {
+            if (! $this->isPermanentMuxException($exception)) {
+                throw $exception;
+            }
+
+            $asset->set('mux_data', array_merge($asset->get('mux_data') ?? [], [
+                'status' => 'errored',
+                'error' => $this->muxErrorData($exception),
+            ]));
+            $asset->saveQuietly();
+
+            Log::warning('Mux asset creation failed permanently.', [
+                'asset' => $this->assetId,
+                'status' => $exception->getCode(),
+                'error' => $this->muxErrorData($exception),
+            ]);
+
+            return;
+        }
 
         $mux_data = [
             'playback_id' => $response->getData()->getPlaybackIds()[0]->getId(),
@@ -70,5 +92,26 @@ class CreateMuxAsset implements ShouldBeUnique, ShouldQueue
     public function uniqueId(): string
     {
         return $this->assetId;
+    }
+
+    private function isPermanentMuxException(ApiException $exception): bool
+    {
+        return $exception->getCode() >= 400 && $exception->getCode() < 500;
+    }
+
+    private function muxErrorData(ApiException $exception): array
+    {
+        $responseBody = $exception->getResponseBody();
+        $error = is_object($responseBody) && isset($responseBody->error) && is_object($responseBody->error)
+            ? $responseBody->error
+            : null;
+
+        return [
+            'code' => $exception->getCode(),
+            'type' => $error->type ?? 'mux_api_error',
+            'messages' => isset($error->messages) && is_array($error->messages)
+                ? $error->messages
+                : [$exception->getMessage()],
+        ];
     }
 }
