@@ -50,8 +50,8 @@ class CreateMuxAsset implements ShouldBeUnique, ShouldQueue
 
         $input = new InputSettings(['url' => $url]);
         $createAssetRequest = new CreateAssetRequest([
-            'input' => [$input],
-            'playback_policy' => [PlaybackPolicy::_PUBLIC],
+            'inputs' => [$input],
+            'playback_policies' => [PlaybackPolicy::_PUBLIC],
         ]);
 
         $response = $assetsApi->createAsset($createAssetRequest);

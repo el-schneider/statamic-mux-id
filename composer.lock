@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55e00427e6c02595ebfc90bbc50f5f7a",
+    "content-hash": "3e097cd7619be4626fbd2198d608c6e3",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -2988,16 +2988,16 @@
         },
         {
             "name": "muxinc/mux-php",
-            "version": "3.21.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/muxinc/mux-php.git",
-                "reference": "575a306ed2cf7e5a8989c840c814f40d0fa92e78"
+                "reference": "a2f3cd9104a22af8f75364beb79a336cb72d749d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/muxinc/mux-php/zipball/575a306ed2cf7e5a8989c840c814f40d0fa92e78",
-                "reference": "575a306ed2cf7e5a8989c840c814f40d0fa92e78",
+                "url": "https://api.github.com/repos/muxinc/mux-php/zipball/a2f3cd9104a22af8f75364beb79a336cb72d749d",
+                "reference": "a2f3cd9104a22af8f75364beb79a336cb72d749d",
                 "shasum": ""
             },
             "require": {
@@ -3040,9 +3040,9 @@
             ],
             "support": {
                 "issues": "https://github.com/muxinc/mux-php/issues",
-                "source": "https://github.com/muxinc/mux-php/tree/3.21.0"
+                "source": "https://github.com/muxinc/mux-php/tree/5.1.0"
             },
-            "time": "2024-11-20T22:10:47+00:00"
+            "time": "2025-08-15T19:34:08+00:00"
         },
         {
             "name": "nesbot/carbon",
