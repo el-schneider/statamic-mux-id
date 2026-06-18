@@ -16,12 +16,6 @@ class MuxIdField extends Field
 
     protected function resolve(Asset $asset, array $args)
     {
-        $mux_data = $asset->get('mux_data');
-
-        if (! isset($mux_data)) {
-            return null;
-        }
-
-        return $mux_data['playback_id'];
+        return $asset->get('mux_data')['playback_id'] ?? null;
     }
 }
